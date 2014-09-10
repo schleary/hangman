@@ -24,6 +24,8 @@
 #body added to hangman (colorize each piece)
 #dashes filled in body gradually
 
+#make it so you can't guess the same word twice
+
 class Game
 
   attr_accessor :phrases, :random_phrase, :user_guess, :letters_array, :bool, :bool_letter, :bool_letter_array
@@ -36,22 +38,22 @@ class Game
 
     @letters_array = [@user_guess]
     @bool_letter_array = []
+
     x = 0
-    while x < 7 do
+    while x < 12 do
       display(@random_phrase, @letters_array, @user_guess, @bool_letter_array)#1
+
       user = UserGuess.new
       @user_guess = user.guess_message
       @letters_array.push(@user_guess)
       @bool_letter = compare(@random_phrase, @user_guess) #boolean or count? maybe hash w/ letter/value
+      puts "BOOL LETTER + #{@bool_letter}"
       @bool_letter_array.push(@bool_letter)
 
-      #####
-      # if the letter is correct,
-      #   display that letter in the dashes
-      # else
-      #   add to the body
-      #
+      total = count_errors(@bool_letter_array)
+      puts"TOTAL NUMBER OF ERRORS: #{total}"
       x += 1
+
     end
 
   end
@@ -68,7 +70,18 @@ class Game
         bool_letter = letter
         return bool_letter
       end
+    end
     return bool_letter
+  end
+
+  def count_errors(array)
+    total = 0
+    array.each do |count|
+      if count == nil
+        total += 1
+      end
+    end
+    return total
   end
 
 end
@@ -89,19 +102,24 @@ class Display
     post_display(@bool_letter_array)
     display_phrase(@phrase, @bool_letter_array)
 
+
     display_used_letters(@letters_array)
 
   end
 
-
   def post_display(bool_letter_array)
+    wrong_guesses = 0
+    bool_letter_array.each do |count|
+      if count == nil
+        wrong_guesses += 1
+      end
+    end
+    puts "********************************"
+    puts ""
     puts ""
     puts "|   ____________"
     puts "|    |/        |"
-    puts "|    |       "#( )
-    puts "|    |       "#\|/
-    puts "|    |        "#|
-    puts "|    |       "#/ \
+    body_parts(wrong_guesses)
     puts "|    |"
     puts "|    |"
     puts "|____|_____"
@@ -109,7 +127,42 @@ class Display
     puts ""
   end
 
-  def add_body_part
+  def body_parts(wrong_guesses)
+    if wrong_guesses >= 1
+      puts "|    |        ( )"
+    else
+      puts "|    |       "#( )""
+    end
+
+    if wrong_guesses >= 2
+      puts "|    |        \\|"
+    else
+      puts "|    |       "#\|/
+    end
+
+    if wrong_guesses >= 3
+      puts "|    |         \|/"
+    else
+      puts "|    |       "#\|/
+    end
+
+    if wrong_guesses >= 4
+      puts "|    |         |"
+    else
+      puts "|    |        "#|
+    end
+
+    if wrong_guesses >= 5
+      puts "|    |        /"
+    else
+      puts "|    |        "#|
+    end
+
+    if wrong_guesses >= 6
+      puts "|    |        / \\"
+    else
+      puts "|    |       "#/ \
+    end
   end
 
   def display_used_letters(letters_array)
@@ -126,18 +179,26 @@ class Display
   end
 
   def display_phrase(phrase, bool_letter_array)
-    puts "WORKING:"
+
+    bool = false
     print "           "
     phrase_array = phrase.split("")
     phrase_array.each do |phrase_letter|
       bool_letter_array.each do |guess_letter|
+
         if phrase_letter == guess_letter
+          bool = true
           print " #{phrase_letter}"
         end
       end
-    end
+      if bool != true
+        print " _"
+      end
+    bool = false
 
-    puts "           " + ("- " * phrase.length)
+    end
+    puts ""
+    puts ""
     puts ""
 
   end
@@ -178,6 +239,6 @@ class UserGuess
   end
 
 end
-end
+
 
 play = Game.new
