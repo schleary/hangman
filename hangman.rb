@@ -134,32 +134,24 @@ class Display
       puts "|    |       "#( )""
     end
 
-    if wrong_guesses >= 2
+    if wrong_guesses >= 3
+      puts "|    |        \\|/"
+    elsif wrong_guesses >= 2
       puts "|    |        \\|"
     else
-      puts "|    |       "#\|/
-    end
-
-    if wrong_guesses >= 3
-      puts "|    |         \|/"
-    else
-      puts "|    |       "#\|/
+      puts "|    |        "#|
     end
 
     if wrong_guesses >= 4
       puts "|    |         |"
     else
-      puts "|    |        "#|
-    end
-
-    if wrong_guesses >= 5
-      puts "|    |        /"
-    else
-      puts "|    |        "#|
+      puts "|    |       "#\|/
     end
 
     if wrong_guesses >= 6
       puts "|    |        / \\"
+    elsif wrong_guesses >= 5
+        puts "|    |        /"
     else
       puts "|    |       "#/ \
     end
