@@ -40,8 +40,8 @@ class Game
     @letters_array = [@user_guess]
     @bool_letter_array = []
 
-    x = 0
-    while x < 12 do
+    @total = 0
+    while @total < 7 do
       display(@random_phrase, @letters_array, @user_guess, @bool_letter_array)#1
 
       user = UserGuess.new
@@ -50,10 +50,11 @@ class Game
       @bool_letter = compare(@random_phrase, @user_guess) #boolean or count? maybe hash w/ letter/value
       @bool_letter_array.push(@bool_letter)
 
-      total = count_errors(@bool_letter_array)
-      x += 1
+      @total = count_errors(@bool_letter_array)
+      puts "TOTAL: #{@total}"
 
     end
+
 
   end
 
@@ -98,8 +99,10 @@ class Display
     @bool_letter_array = bool_letter_array
 
     post_display(@bool_letter_array)
-    display_phrase(@phrase, @bool_letter_array)
-
+    notification = display_phrase(@phrase, @bool_letter_array)
+    if notification != true
+      abort("YOU WIN!")
+    end
 
     display_used_letters(@letters_array)
 
@@ -154,7 +157,6 @@ class Display
     if wrong_guesses >= 6
       print "|    |        "
       puts "/ \\".colorize(:magenta)
-      puts ""
       abort ("You lose!")
     elsif wrong_guesses >= 5
         print "|    |        "
@@ -178,7 +180,7 @@ class Display
   end
 
   def display_phrase(phrase, bool_letter_array)
-
+    notify = false
     bool = false
     print "           "
     phrase_array = phrase.split("")
@@ -192,6 +194,7 @@ class Display
       end
       if bool != true
         print " _"
+        notify = true
       end
     bool = false
 
@@ -199,7 +202,7 @@ class Display
     puts ""
     puts ""
     puts ""
-
+    return notify
   end
 
 end
