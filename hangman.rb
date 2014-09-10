@@ -26,7 +26,7 @@
 
 class Game
 
-  attr_accessor :phrases, :random_phrase, :user_guess, :letters_array, :bool
+  attr_accessor :phrases, :random_phrase, :user_guess, :letters_array, :bool, :bool_letter, :bool_letter_array
 
   def initialize
 
@@ -35,32 +35,40 @@ class Game
     @user_guess = ""
 
     @letters_array = [@user_guess]
+    @bool_letter_array = []
     x = 0
-    while x < 4 do
-      display(@random_phrase, @letters_array, @user_guess)#1
+    while x < 7 do
+      display(@random_phrase, @letters_array, @user_guess, @bool_letter_array)#1
       user = UserGuess.new
       @user_guess = user.guess_message
       @letters_array.push(@user_guess)
-      @bool = compare(@random_phrase, @user_guess) #boolean or count? maybe hash w/ letter/value
-  
+      @bool_letter = compare(@random_phrase, @user_guess) #boolean or count? maybe hash w/ letter/value
+      @bool_letter_array.push(@bool_letter)
+
+      #####
+      # if the letter is correct,
+      #   display that letter in the dashes
+      # else
+      #   add to the body
+      #
       x += 1
     end
 
   end
 
-  def display(rand_phrase, letters_array, user_guess)
-    show = Display.new(rand_phrase, letters_array, user_guess)#2
+  def display(rand_phrase, letters_array, user_guess, bool_letter_array)
+    show = Display.new(rand_phrase, letters_array, user_guess, bool_letter_array)#2
   end
 
   def compare(phrase, letter)
-    bool = false
+    bool_letter = nil
     phrase_letters = phrase.split("")
     phrase_letters.each do |comparison|
       if comparison == letter
-        bool = true
-        return bool
+        bool_letter = letter
+        return bool_letter
       end
-    return bool
+    return bool_letter
   end
 
 end
@@ -69,23 +77,24 @@ end
 
 class Display
 
-  attr_accessor :phrase, :letters_array, :letter
+  attr_accessor :phrase, :letters_array, :letter, :bool_letter_array
 
-  def initialize(phrase, letters_array, letter)#3
+  def initialize(phrase, letters_array, letter, bool_letter_array)#3
     @phrase = phrase
     puts @phrase
     @letters_array = letters_array
     @letter = letter
+    @bool_letter_array = bool_letter_array
 
-    post_display
-    display_phrase(phrase)
+    post_display(@bool_letter_array)
+    display_phrase(@phrase, @bool_letter_array)
 
     display_used_letters(@letters_array)
 
   end
 
 
-  def post_display
+  def post_display(bool_letter_array)
     puts ""
     puts "|   ____________"
     puts "|    |/        |"
@@ -116,8 +125,18 @@ class Display
     puts""
   end
 
-  def display_phrase(phrase)
-    puts ""
+  def display_phrase(phrase, bool_letter_array)
+    puts "WORKING:"
+    print "           "
+    phrase_array = phrase.split("")
+    phrase_array.each do |phrase_letter|
+      bool_letter_array.each do |guess_letter|
+        if phrase_letter == guess_letter
+          print " #{phrase_letter}"
+        end
+      end
+    end
+
     puts "           " + ("- " * phrase.length)
     puts ""
 
