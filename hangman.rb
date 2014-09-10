@@ -25,6 +25,7 @@
 #dashes filled in body gradually
 
 #make it so you can't guess the same word twice
+require 'colorize'
 
 class Game
 
@@ -47,11 +48,9 @@ class Game
       @user_guess = user.guess_message
       @letters_array.push(@user_guess)
       @bool_letter = compare(@random_phrase, @user_guess) #boolean or count? maybe hash w/ letter/value
-      puts "BOOL LETTER + #{@bool_letter}"
       @bool_letter_array.push(@bool_letter)
 
       total = count_errors(@bool_letter_array)
-      puts"TOTAL NUMBER OF ERRORS: #{total}"
       x += 1
 
     end
@@ -94,7 +93,6 @@ class Display
 
   def initialize(phrase, letters_array, letter, bool_letter_array)#3
     @phrase = phrase
-    puts @phrase
     @letters_array = letters_array
     @letter = letter
     @bool_letter_array = bool_letter_array
@@ -114,6 +112,7 @@ class Display
         wrong_guesses += 1
       end
     end
+    puts ""
     puts "********************************"
     puts ""
     puts ""
@@ -129,31 +128,39 @@ class Display
 
   def body_parts(wrong_guesses)
     if wrong_guesses >= 1
-      puts "|    |        ( )"
+      print "|    |        "
+      puts "( )".colorize(:red)
     else
-      puts "|    |       "#( )""
+      puts "|    |       "
     end
 
     if wrong_guesses >= 3
-      puts "|    |        \\|/"
+      print "|    |        "
+      puts "\\|/".colorize(:light_blue)
     elsif wrong_guesses >= 2
-      puts "|    |        \\|"
+      print "|    |        "
+      puts "\\|".colorize(:blue)
     else
-      puts "|    |        "#|
+      puts "|    |        "
     end
 
     if wrong_guesses >= 4
-      puts "|    |         |"
+      print "|    |         "
+      puts "|".colorize(:green)
     else
-      puts "|    |       "#\|/
+      puts "|    |       "
     end
 
     if wrong_guesses >= 6
-      puts "|    |        / \\"
+      print "|    |        "
+      puts "/ \\".colorize(:magenta)
+      puts ""
+      abort ("You lose!")
     elsif wrong_guesses >= 5
-        puts "|    |        /"
+        print "|    |        "
+        puts "/".colorize(:magenta)
     else
-      puts "|    |       "#/ \
+      puts "|    |       "
     end
   end
 
