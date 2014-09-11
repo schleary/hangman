@@ -16,32 +16,32 @@ class Game
     while @total < 7 do
       display(@random_phrase, @letters_array, @guess, @bool_letter_array)
 
-
-      #while loop; until
       reattempt = false
       stop = false
+
       while stop == false do
         puts "           Guess a letter!"
         print "           "
         @guess = gets.chomp.downcase
-
         reattempt = false
         stop = false
-
         tracker = 0
-        @letters_array.each do |previous_guess|
 
+        @letters_array.each do |previous_guess|
           tracker += 1
+
           if previous_guess == @guess
             puts "           You already chose that letter!"
             puts ""
             reattempt = true
           end
+
         end
+
         if ((tracker == @letters_array.length)  && (reattempt != true))
           stop = true
         end
-
+             
       end
 
       @letters_array.push(@guess)
