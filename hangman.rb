@@ -230,5 +230,4 @@ class UserGuess
 
 end
 
-
 play = Game.new
