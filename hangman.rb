@@ -1,65 +1,58 @@
-#The word to guess is represented by a row of dashes, giving the number of letters. If
-#the guessing player suggests a letter or number which occurs in the word, the other player
-# writes it in all its correct positions. If the suggested letter or number does not occur in the
-# word, the other player draws one element of the hanged man stick figure as a tally mark. The
-# game is over when:
-#
-# The guessing player completes the word, or guesses the whole word correctly
-# The other player completes the diagram:
-# To get the hang of gameplay, here is an online version to play
-#
-
-# Use the colorize gem to make each piece of the hangman a different color.
-# Place the application flow/logic in a method outside of any class, call this method at the
-# end of the file to start the game.
-#Display a post
-#determine phrase to use
-#display dashes
-#display letters guessed (downcase)
-
-#player guesses (types in) a letter
-#redisplay with:
-#letters crossed out and
-#either/or:
-#body added to hangman (colorize each piece)
-#dashes filled in body gradually
-
-#make it so you can't guess the same word twice
 require 'colorize'
 
 class Game
 
-  attr_accessor :phrases, :random_phrase, :user_guess, :letters_array, :bool, :bool_letter, :bool_letter_array
+  attr_accessor :phrases, :random_phrase, :letters_array, :bool, :bool_letter, :bool_letter_array, :guess
 
   def initialize
 
     @phrases = Phrases.new(["antidisestablishmentarianism", "refrigerator", "xenophobia", "octogenarian", "ambidextrous", "pterodactyl"])
     @random_phrase = @phrases.randomize
-    @user_guess = ""
-
-    @letters_array = [@user_guess]
+    @guess = " "
+    @letters_array = [@guess]
     @bool_letter_array = []
 
     @total = 0
     while @total < 7 do
-      display(@random_phrase, @letters_array, @user_guess, @bool_letter_array)#1
+      display(@random_phrase, @letters_array, @guess, @bool_letter_array)
 
-      user = UserGuess.new
-      @user_guess = user.guess_message
-      @letters_array.push(@user_guess)
-      @bool_letter = compare(@random_phrase, @user_guess) #boolean or count? maybe hash w/ letter/value
+
+      #while loop; until
+      reattempt = false
+      stop = false
+      while stop == false do
+        puts "           Guess a letter!"
+        print "           "
+        @guess = gets.chomp.downcase
+
+        reattempt = false
+        stop = false
+
+        tracker = 0
+        @letters_array.each do |previous_guess|
+
+          tracker += 1
+          if previous_guess == @guess
+            puts "           You already chose that letter!"
+            puts ""
+            reattempt = true
+          end
+        end
+        if ((tracker == @letters_array.length)  && (reattempt != true))
+          stop = true
+        end
+
+      end
+
+      @letters_array.push(@guess)
+      @bool_letter = compare(@random_phrase, @guess)
       @bool_letter_array.push(@bool_letter)
-
       @total = count_errors(@bool_letter_array)
-      puts "TOTAL: #{@total}"
-
     end
-
-
   end
 
   def display(rand_phrase, letters_array, user_guess, bool_letter_array)
-    show = Display.new(rand_phrase, letters_array, user_guess, bool_letter_array)#2
+    show = Display.new(rand_phrase, letters_array, user_guess, bool_letter_array)
   end
 
   def compare(phrase, letter)
@@ -83,10 +76,7 @@ class Game
     end
     return total
   end
-
 end
-
-
 
 class Display
 
@@ -98,17 +88,16 @@ class Display
     @letter = letter
     @bool_letter_array = bool_letter_array
 
-    post_display(@bool_letter_array)
+    post_display(@bool_letter_array, @phrase)
     notification = display_phrase(@phrase, @bool_letter_array)
     if notification != true
-      abort("YOU WIN!")
+      abort("           YOU WIN!")
     end
 
     display_used_letters(@letters_array)
-
   end
 
-  def post_display(bool_letter_array)
+  def post_display(bool_letter_array, phrase)
     wrong_guesses = 0
     bool_letter_array.each do |count|
       if count == nil
@@ -121,7 +110,7 @@ class Display
     puts ""
     puts "|   ____________"
     puts "|    |/        |"
-    body_parts(wrong_guesses)
+    body_parts(wrong_guesses, phrase)
     puts "|    |"
     puts "|    |"
     puts "|____|_____"
@@ -129,7 +118,7 @@ class Display
     puts ""
   end
 
-  def body_parts(wrong_guesses)
+  def body_parts(wrong_guesses, phrase)
     if wrong_guesses >= 1
       print "|    |        "
       puts "( )".colorize(:red)
@@ -157,7 +146,12 @@ class Display
     if wrong_guesses >= 6
       print "|    |        "
       puts "/ \\".colorize(:magenta)
-      abort ("You lose!")
+      puts "|    |"
+      puts "|    |"
+      puts "|____|_____"
+      puts ""
+      puts ""
+      abort ("You lose! The word was #{phrase}!")
     elsif wrong_guesses >= 5
         print "|    |        "
         puts "/".colorize(:magenta)
@@ -175,7 +169,6 @@ class Display
       print letters
       print " "
     end
-
     puts""
   end
 
@@ -186,7 +179,6 @@ class Display
     phrase_array = phrase.split("")
     phrase_array.each do |phrase_letter|
       bool_letter_array.each do |guess_letter|
-
         if phrase_letter == guess_letter
           bool = true
           print " #{phrase_letter}"
@@ -196,18 +188,14 @@ class Display
         print " _"
         notify = true
       end
-    bool = false
-
+      bool = false
     end
     puts ""
     puts ""
     puts ""
     return notify
   end
-
 end
-
-
 
 class Phrases
 
@@ -228,7 +216,7 @@ class UserGuess
 
   attr_accessor :guess, :phrase
 
-  def initialize()#phrase
+  def initialize()
     @phrase = phrase
   end
 
